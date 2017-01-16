@@ -36,9 +36,12 @@ module Tilt
       end
     end
 
-    # for now caching is not supported, but at least we can transparently ignore it
     def cache!(key=nil, options={}, &block)
-      yield
+      value = ::Rails.cache.fetch(key, options) do
+        _scope { yield self }
+      end
+      
+      merge! value
     end
 
     private
